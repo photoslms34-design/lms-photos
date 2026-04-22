@@ -23,7 +23,7 @@ h1 { font-size: 22px; font-weight: 700; color: #1B2D4F; margin-bottom: 8px; text
 .step-num { min-width: 30px; height: 30px; border-radius: 50%; background: #1B2D4F; color: white; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .step-text { font-size: 14px; color: #444; line-height: 1.6; padding-top: 4px; }
 .step-text strong { color: #1B2D4F; }
-.btn-main { display: block; width: 100%; padding: 17px; background: #E8A020; color: white; border: none; border-radius: 14px; font-size: 17px; font-weight: 700; text-align: center; text-decoration: none; margin-bottom: 12px; }
+.btn-main { display: block; width: 100%; padding: 17px; background: #E8A020; color: white; border: none; border-radius: 14px; font-size: 17px; font-weight: 700; text-align: center; text-decoration: none; margin-bottom: 12px; cursor: pointer; }
 .btn-tel { display: block; width: 100%; padding: 15px; background: white; color: #1B2D4F; border: 2px solid #1B2D4F; border-radius: 14px; font-size: 15px; font-weight: 600; text-align: center; text-decoration: none; }
 .footer { font-size: 12px; color: #BBB; text-align: center; margin-top: 24px; line-height: 1.8; }
 </style>
@@ -66,38 +66,49 @@ h1 { font-size: 22px; font-weight: 700; color: #1B2D4F; margin-bottom: 8px; text
   <div class="footer">La Maison des Services<br>photos.lms34@gmail.com</div>
 </div>
 <script>
-// Lit l'URL COMPLETE (document.URL) - capture tout meme les espaces non encodes
-// Meme technique que le script RingOver pour les backslash
-var url = document.URL;
-var titre = "";
+(function() {
+  // Lit l'URL complete - meme technique que script RingOver pour les backslash
+  var url = window.location.href;
+  var titre = "";
 
-var idx = url.indexOf("dossier=");
-if (idx !== -1) {
-  // Prend TOUT apres "dossier=" - espaces et \\ inclus
-  var brut = url.substring(idx + 8);
-  // Supprime les ancres (#...) eventuelles
-  brut = brut.split("#")[0];
-  // Nettoie comme dans le script RingOver : split sur \ puis join
-  var parties = brut.split("\\").map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
-  if (parties.length > 1) {
-    titre = parties.join(" - ");
-  } else {
-    // Simple split sur \ simple
-    parties = brut.split("\").map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
-    titre = parties.join(" - ");
+  var idx = url.indexOf("dossier=");
+  if (idx !== -1) {
+    // Prend TOUT apres dossier= jusqu'a la fin (espaces inclus)
+    var brut = url.substring(idx + 8);
+    // Supprime fragment # si present
+    brut = brut.split("#")[0];
+    // Decode les %XX si encodes
+    try { brut = decodeURIComponent(brut); } catch(e) {}
+    // Remplace + par espaces
+    brut = brut.replace(/\+/g, " ");
+    // Nettoie les \\ comme dans le script RingOver
+    var parties = brut.split("\\").map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
+    if (parties.length > 1) {
+      titre = parties.join(" - ");
+    } else {
+      // Essai avec \ simple
+      parties = brut.split("\").map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
+      titre = parties.join(" - ");
+    }
   }
-}
 
-if (!titre) titre = "Reference non precisee";
+  if (!titre) titre = "Reference non precisee";
 
-var el = document.getElementById("dossier-titre");
-el.textContent = titre;
-el.style.userSelect = "none";
-el.style.webkitUserSelect = "none";
+  // Affiche le titre
+  var el = document.getElementById("dossier-titre");
+  el.textContent = titre;
+  el.style.userSelect = "none";
+  el.style.webkitUserSelect = "none";
 
-var corps = "Bonjour,\n\nVeuillez trouver ci-joint les photos concernant le probleme constate.\n\nCordialement";
-var lien = "mailto:photos.lms34@gmail.com?subject=" + encodeURIComponent(titre) + "&body=" + encodeURIComponent(corps);
-document.getElementById("btn-mailto").href = lien;
+  // Bouton mailto
+  var corps = "Bonjour,\n\nVeuillez trouver ci-joint les photos concernant le probleme constate.\n\nCordialement";
+  var lien = "mailto:photos.lms34@gmail.com?subject=" + encodeURIComponent(titre) + "&body=" + encodeURIComponent(corps);
+  var btn = document.getElementById("btn-mailto");
+  btn.href = lien;
+  btn.addEventListener("click", function(e) {
+    window.location.href = lien;
+  });
+})();
 </script>
 </body>
 </html>
