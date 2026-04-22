@@ -9,7 +9,7 @@
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #F0F2F5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .card { background: white; border-radius: 20px; padding: 32px 24px; max-width: 420px; width: 100%; box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
 .logo-wrap { text-align: center; margin-bottom: 24px; }
-.logo-wrap img { height: 100px; width: auto; max-width: 100%; object-fit: contain; }
+.logo-wrap img { height: 100px; width: auto; max-width: 100%; }
 h1 { font-size: 22px; font-weight: 700; color: #1B2D4F; margin-bottom: 8px; text-align: center; }
 .subtitle { font-size: 15px; color: #666; line-height: 1.6; margin-bottom: 24px; text-align: center; }
 .dossier-box { background: #F0F4F8; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; border: 1px solid #D8E2ED; position: relative; }
@@ -66,39 +66,36 @@ h1 { font-size: 22px; font-weight: 700; color: #1B2D4F; margin-bottom: 8px; text
   <div class="footer">La Maison des Services<br>photos.lms34@gmail.com</div>
 </div>
 <script>
-function nettoyer(t) {
-  t = t.replace(/\s*\\\\\s*/g, " - ");
-  t = t.replace(/\s*-\s*$/, "").trim();
-  return t;
-}
-
+// Lit l'URL COMPLETE (document.URL) - capture tout meme les espaces non encodes
+// Meme technique que le script RingOver pour les backslash
+var url = document.URL;
 var titre = "";
 
-// Méthode 1 : Hash (#) - ne casse jamais sur iPhone
-var hash = window.location.hash;
-if (hash && hash.length > 1) {
-  try { titre = decodeURIComponent(hash.substring(1)); }
-  catch(e) { titre = hash.substring(1); }
-}
-
-// Méthode 2 : Query string (?dossier=) - fallback
-if (!titre) {
-  var m = window.location.search.match(/[?&]dossier=([^#]*)/);
-  if (m) {
-    try { titre = decodeURIComponent(m[1].replace(/\+/g, " ")); }
-    catch(e) { titre = m[1]; }
+var idx = url.indexOf("dossier=");
+if (idx !== -1) {
+  // Prend TOUT apres "dossier=" - espaces et \\ inclus
+  var brut = url.substring(idx + 8);
+  // Supprime les ancres (#...) eventuelles
+  brut = brut.split("#")[0];
+  // Nettoie comme dans le script RingOver : split sur \ puis join
+  var parties = brut.split("\\").map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
+  if (parties.length > 1) {
+    titre = parties.join(" - ");
+  } else {
+    // Simple split sur \ simple
+    parties = brut.split("\").map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
+    titre = parties.join(" - ");
   }
 }
 
-titre = nettoyer(titre);
-if (!titre) titre = "Référence non précisée";
+if (!titre) titre = "Reference non precisee";
 
 var el = document.getElementById("dossier-titre");
 el.textContent = titre;
 el.style.userSelect = "none";
 el.style.webkitUserSelect = "none";
 
-var corps = "Bonjour,\n\nVeuillez trouver ci-joint les photos concernant le problème constaté.\n\nCordialement";
+var corps = "Bonjour,\n\nVeuillez trouver ci-joint les photos concernant le probleme constate.\n\nCordialement";
 var lien = "mailto:photos.lms34@gmail.com?subject=" + encodeURIComponent(titre) + "&body=" + encodeURIComponent(corps);
 document.getElementById("btn-mailto").href = lien;
 </script>
