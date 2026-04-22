@@ -23,7 +23,7 @@ h1{font-size:22px;font-weight:700;color:#1B2D4F;margin-bottom:8px;text-align:cen
 .step-num{min-width:30px;height:30px;border-radius:50%;background:#1B2D4F;color:white;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .step-text{font-size:14px;color:#444;line-height:1.6;padding-top:4px}
 .step-text strong{color:#1B2D4F}
-.btn-main{display:block;width:100%;padding:17px;background:#E8A020;color:white;border:none;border-radius:14px;font-size:17px;font-weight:700;text-align:center;text-decoration:none;margin-bottom:12px;cursor:pointer}
+.btn-main{display:block;width:100%;padding:17px;background:#E8A020;color:white;border-radius:14px;font-size:17px;font-weight:700;text-align:center;text-decoration:none;margin-bottom:12px;cursor:pointer;border:none}
 .btn-tel{display:block;width:100%;padding:15px;background:white;color:#1B2D4F;border:2px solid #1B2D4F;border-radius:14px;font-size:15px;font-weight:600;text-align:center;text-decoration:none}
 .footer{font-size:12px;color:#BBB;text-align:center;margin-top:24px;line-height:1.8}
 </style>
@@ -64,11 +64,16 @@ h1{font-size:22px;font-weight:700;color:#1B2D4F;margin-bottom:8px;text-align:cen
     try{ titre = decodeURIComponent(hash.substring(1)); }catch(e){ titre = hash.substring(1); }
   }
   if(!titre) titre = "Reference non precisee";
+  
   document.getElementById("titre").textContent = titre;
+  
   var corps = "Bonjour,\n\nVeuillez trouver ci-joint les photos concernant le probleme constate.\n\nCordialement";
   var lien = "mailto:photos.lms34@gmail.com?subject=" + encodeURIComponent(titre) + "&body=" + encodeURIComponent(corps);
-  document.getElementById("btn").href = lien;
-  document.getElementById("btn").onclick = function(){ window.location.href = lien; };
+  
+  // Bouton - fonctionne sur iPhone et Android
+  var btn = document.getElementById("btn");
+  btn.href = lien;
+  btn.setAttribute("href", lien);
 })();
 </script>
 </body>
